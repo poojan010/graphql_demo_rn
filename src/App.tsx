@@ -1,12 +1,11 @@
 import React from 'react';
-import { Provider } from 'react-redux';
-
-import { PersistGate } from 'redux-persist/integration/react';
+import { ApolloProvider } from '@apollo/client';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-
+import client from './ApolloClient';
 import Routers from './navigator';
-import { persistor, store } from 'store/index';
+import ThemeProvider from './theme/ThemeProvider';
+
 
 
 const App = () => (
@@ -16,9 +15,9 @@ const App = () => (
 );
 
 export default () => (
-    <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
+    <ApolloProvider client={client}>
+        <ThemeProvider>
             <App />
-        </PersistGate>
-    </Provider>
+        </ThemeProvider>
+    </ApolloProvider>
 );

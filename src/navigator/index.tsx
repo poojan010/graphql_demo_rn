@@ -1,10 +1,11 @@
-import React, { FC } from "react"
+import React from "react"
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
-import Main from "containers/Main";
-
 import { setNavigator } from "./navHelper";
+
+import Home from "containers/Home";
+import AnimeDetails from "containers/AnimeDetails";
 
 
 
@@ -18,7 +19,8 @@ const Routers = () => {
         >
             <Stack.Navigator screenOptions={{ headerShown: false }}>
 
-                <Stack.Screen name="Main" component={Main} />
+                <Stack.Screen name="Home" component={Home} />
+                <Stack.Screen name="AnimeDetails" component={AnimeDetails} />
 
             </Stack.Navigator>
         </NavigationContainer>
