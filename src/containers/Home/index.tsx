@@ -7,6 +7,7 @@ import { HOME_DATA } from './queries'
 
 import constants from 'constants/index';
 import useThemedStyles from 'hooks/useThemedStyles';
+import RouteParamsList from 'navigator/routeParams';
 
 import { HorizontalList } from 'components/index';
 
@@ -20,9 +21,11 @@ const mapFunction = (item: any, index: number) => ({
 const mainListKey = "homeData"
 
 
-interface ScreenProps extends NativeStackScreenProps<any> { }
+interface ScreenProps extends NativeStackScreenProps<RouteParamsList, "Home"> { }
 
-const Home: React.FC<ScreenProps> = () => {
+const Home: React.FC<ScreenProps> = (props) => {
+    const { navigation } = props
+
     const style = useThemedStyles(styles);
 
     const { loading, refetch, data, error } = useQuery(HOME_DATA, {
@@ -47,6 +50,12 @@ const Home: React.FC<ScreenProps> = () => {
         { title: constants.homePage.top100, data: data.top.media },
     ]
 
+    const goToItemDetails = (mediaItem: any) => {
+        navigation.navigate("AnimeDetails", {
+            mediaItem: mediaItem
+        })
+    }
+
     const renderSectionItem = ({ item, index }: { item: any, index: number }) => {
         const key = index.toString()
         return (
@@ -55,9 +64,9 @@ const Home: React.FC<ScreenProps> = () => {
                 numColumns={3}
                 list={item.data}
                 title={item.title}
-                onPressItem={() => { }}
                 mapFunction={mapFunction}
                 onPressViewAll={() => { }}
+                onPressItem={goToItemDetails}
             />
         )
     }
@@ -86,7 +95,6 @@ const styles = (theme: any) => StyleSheet.create({
     mainListStyle: {
         marginHorizontal: 15,
     }
-
 });
 
 export default Home;

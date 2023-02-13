@@ -9,6 +9,15 @@ const constants = {
     mediaHorizontalList: {
         viewAll: "View All"
     },
+
+    animeDetails: {
+        addToList: "Add to List"
+    },
+
+    screens: {
+        home: "Home",
+        animeDetails: "AnimeDetails"
+    }
 }
 
 export default constants

@@ -1,7 +1,7 @@
 
 const light = {
     background: "#fff",
-    text: "#000"
+    text: "#36454F",
 }
 
 const dark = {

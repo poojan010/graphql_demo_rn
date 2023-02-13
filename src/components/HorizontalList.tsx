@@ -3,6 +3,7 @@ import { FlatList, Image, ImageStyle, StyleProp, StyleSheet, Text, TouchableOpac
 
 import { WINDOW } from 'utils/index'
 import constants from 'constants/index'
+
 import useThemedStyles from 'hooks/useThemedStyles'
 
 import PressableText from './PressableText'
@@ -70,14 +71,17 @@ const HorizontalList: FC<HListProps> = (props) => {
     const updatedList: any = list.map(mapFunction)
 
     const renderItem = ({ item, index }: { item: any, index: number }) => {
+        const orginalItem = list[index]
+
         const key = index.toString()
+
         return (
             <MediaCard
                 key={key}
                 item={item}
                 index={index}
-                onPress={onPressItem}
                 numColumns={numColumns}
+                onPress={onPressItem.bind(this, orginalItem)}
             />
         )
     }
@@ -114,15 +118,15 @@ export default HorizontalList
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginVertical: 20
+        marginVertical: 25
     },
     topRowContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
     },
     titleStyle: {
-        fontSize: 15,
-        fontWeight: '500',
+        fontSize: 17,
+        fontWeight: '700',
         color: theme.colors.text,
     },
     buttonTextStyle: {
