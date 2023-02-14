@@ -6,11 +6,13 @@ import client from './ApolloClient';
 import Routers from './navigator';
 import ThemeProvider from './theme/ThemeProvider';
 
+import { HelperButton } from './components';
 
 
 const App = () => (
     <SafeAreaProvider>
         <Routers />
+        <HelperButton />
     </SafeAreaProvider>
 );
 

@@ -17,7 +17,7 @@ const constants = {
     screens: {
         home: "Home",
         animeDetails: "AnimeDetails"
-    }
+    },
 }
 
 export default constants
