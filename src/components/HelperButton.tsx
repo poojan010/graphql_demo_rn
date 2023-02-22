@@ -13,7 +13,7 @@ const MenuIcon = () => {
     return (
         <Entypo
             name={"menu"}
-            size={25}
+            size={30}
             color={theme.colors.secondary}
         />
     )
@@ -63,7 +63,7 @@ const styles = (theme: any) => StyleSheet.create({
         bottom: WINDOW.width / 6.5,
     },
     button: {
-        padding: 10,
+        padding: 7,
         backgroundColor: theme.colors.background2
     },
     shadowCardContainer: {

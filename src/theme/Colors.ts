@@ -4,7 +4,7 @@ const light = {
     text: "#36454F",
     secondary: "#1F51FF",
     background2: "#F8F6F0",
-    shadowColor: "#0000000",
+    shadowColor: "#000000",
 }
 
 const dark = {

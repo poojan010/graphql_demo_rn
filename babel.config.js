@@ -18,6 +18,7 @@ module.exports = {
                     hooks: './src/hooks',
                 }
             }
-        ]
+        ],
+        'react-native-reanimated/plugin',
     ]
 };

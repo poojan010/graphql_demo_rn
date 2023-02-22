@@ -11,7 +11,11 @@ const constants = {
     },
 
     animeDetails: {
-        addToList: "Add to List"
+        addToList: "Add to List",
+        description: "Description",
+        characters: "Characters",
+        recommendations: "Recommendations",
+        relations: "Relations",
     },
 
     screens: {

@@ -1,27 +1,24 @@
-import React, { useRef } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@apollo/client';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Animated, ImageStyle, SafeAreaView, StatusBar, StyleProp, StyleSheet, Text, TouchableOpacity, ViewStyle } from 'react-native';
+import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 
 import { WINDOW } from 'utils/index';
 import constants from 'constants/index';
 import useThemedStyles from 'hooks/useThemedStyles';
-
 import RouteParamsList from 'navigator/routeParams';
 
+import { GET_MEDIA_DETAILS } from './queries';
 
+import {
+    tabRoutes, BANNER_IMAGE_HEIGHT, COVER_IMAGE_WIDTH, HEADER_MAX_HEIGHT,
+    interpolateHeader, interpolateBannerOpacity, interpolateBannerY, interpolateCoverY,
+    interpolateCoverOpacity, interpolateButtonY, interpolateButtonOpacity, interpolateScrollViewY,
+} from './helper';
 
-const statusBarHeight = StatusBar?.currentHeight ? StatusBar.currentHeight : 32
-
-
-const HEADER_MAX_HEIGHT = WINDOW.height / 2.7
-const HEADER_MIN_HEIGHT = WINDOW.height / 8
-const HEADER_HEIGHT_DIFF = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
-
-
-const BANNER_IMAGE_HEIGHT = WINDOW.height / 4
-
-const COVER_IMAGE_HEIGHT = WINDOW.height / 4.5
-const COVER_IMAGE_WIDTH = WINDOW.width / 3.75
+import TabBar from 'components/TabBar';
+import OverviewTab from './Tabs/OverviewTab';
 
 
 
@@ -31,85 +28,163 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
 
     const style = useThemedStyles(styles);
 
-    const { route: { params: { mediaItem } } } = props
-    if (__DEV__) console.log(mediaItem);
+    const { route: { params: { mediaItem: mediaItemFromParams } } } = props
+
+    const { loading, refetch, data, error } = useQuery(GET_MEDIA_DETAILS, {
+        variables: {
+            id: mediaItemFromParams?.id,
+            type: mediaItemFromParams?.type,
+            isAdult: mediaItemFromParams?.isAdult,
+        }
+    })
+
+    const [tabIndex, setTabIndex] = useState(0)
+
+    const mediaItem = loading || error
+        ? mediaItemFromParams
+        : data.Media
+
 
     const bannerImageSource = { uri: mediaItem.bannerImage }
     const coverImageSource = { uri: mediaItem?.coverImage?.large }
 
-    const scrollYValue = useRef(new Animated.Value(0)).current
 
+    const scrollYValue = useSharedValue(0)
 
-    /* Interpolation Values */
-
-    const headerTranslateY = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF],
-        outputRange: [0, -HEADER_HEIGHT_DIFF],
-        extrapolate: "clamp"
-    })
-
-    const bannerImageTranslateY = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF],
-        outputRange: [0, 100],
-        extrapolate: 'clamp',
-    });
-
-    const bannerImageOpacity = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF / 4, HEADER_HEIGHT_DIFF / 2, HEADER_HEIGHT_DIFF / 1.5, HEADER_HEIGHT_DIFF],
-        outputRange: [1, 0.8, 0.6, 0.3, 0],
-        extrapolate: 'clamp',
-    });
-
-    const coverImageTranslateY = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF],
-        outputRange: [0, -10],
-        extrapolate: 'clamp',
-    });
-
-    const coverImageOpacity = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF / 4, HEADER_HEIGHT_DIFF / 2, HEADER_HEIGHT_DIFF / 1.5, HEADER_HEIGHT_DIFF],
-        outputRange: [1, 0.8, 0.6, 0.3, 0],
-        extrapolate: 'clamp',
-    });
-
-    const buttonTranslateY = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF],
-        outputRange: [0, -10],
-        extrapolate: 'clamp',
-    });
-
-    const buttonOpacity = scrollYValue.interpolate({
-        inputRange: [0, HEADER_HEIGHT_DIFF / 4, HEADER_HEIGHT_DIFF / 2, HEADER_HEIGHT_DIFF / 1.5, HEADER_HEIGHT_DIFF],
-        outputRange: [1, 0.8, 0.6, 0.3, 0],
-        extrapolate: 'clamp',
+    const scrollHandler = useAnimatedScrollHandler((event) => {
+        scrollYValue.value = event.contentOffset.y;
     });
 
 
     /* Styles */
+    const headerAnimatedStyles = useAnimatedStyle(() => {
+        return {
+            transform: [{
+                translateY: interpolate(
+                    scrollYValue.value,
+                    interpolateHeader.inputRange,
+                    interpolateHeader.outputRange,
+                    interpolateHeader.extrapolate,
+                )
+            }],
+        };
+    });
 
-    // @ts-ignore
-    const headerAnimatedStyles: StyleProp<ViewStyle> = {
-        transform: [{ translateY: headerTranslateY }],
+    const animatedBannerImageStyles = useAnimatedStyle(() => {
+        return {
+            transform: [{
+                translateY: interpolate(
+                    scrollYValue.value,
+                    interpolateBannerY.inputRange,
+                    interpolateBannerY.outputRange,
+                    interpolateBannerY.extrapolate
+                )
+            }],
+            opacity: interpolate(
+                scrollYValue.value,
+                interpolateBannerOpacity.inputRange,
+                interpolateBannerOpacity.outputRange,
+                interpolateBannerOpacity.extrapolate
+            )
+
+        };
+    });
+
+    const animatedCoverImageStyles = useAnimatedStyle(() => {
+        return {
+            transform: [{
+                translateY: interpolate(
+                    scrollYValue.value,
+                    interpolateCoverY.inputRange,
+                    interpolateCoverY.outputRange,
+                    interpolateCoverY.extrapolate
+                )
+
+            }],
+            opacity: interpolate(
+                scrollYValue.value,
+                interpolateCoverOpacity.inputRange,
+                interpolateCoverOpacity.outputRange,
+                interpolateCoverOpacity.extrapolate
+            )
+        };
+    });
+
+    const animatedButtonStyles = useAnimatedStyle(() => {
+        return {
+            transform: [{
+                translateY: interpolate(
+                    scrollYValue.value,
+                    interpolateButtonY.inputRange,
+                    interpolateButtonY.outputRange,
+                    interpolateButtonY.extrapolate
+                )
+            }],
+            opacity: interpolate(
+                scrollYValue.value,
+                interpolateButtonOpacity.inputRange,
+                interpolateButtonOpacity.outputRange,
+                interpolateButtonOpacity.extrapolate
+            )
+        };
+    });
+
+    const animatedScollViewStyles = useAnimatedStyle(() => {
+        return {
+            transform: [{
+                translateY: interpolate(
+                    scrollYValue.value,
+                    interpolateScrollViewY.inputRange,
+                    interpolateScrollViewY.outputRange,
+                    interpolateScrollViewY.extrapolate
+                )
+            }],
+        };
+    });
+
+
+
+    const ScrollWrapper = ({ children }: { children: any }) => {
+        const contentOffset = {
+            x: 0,
+            y: scrollYValue.value
+        }
+
+        const renderItem = ({ item, index }: any) => (
+            <Animated.View style={[animatedScollViewStyles]}>
+                {children}
+            </Animated.View>
+        )
+
+        return (
+            <Animated.FlatList
+                data={[""]}
+                bounces={false}
+                renderItem={renderItem}
+                scrollEventThrottle={1}
+                onScroll={scrollHandler}
+                decelerationRate={'fast'}
+                ListEmptyComponent={null}
+                nestedScrollEnabled={true}
+                alwaysBounceVertical={false}
+                contentOffset={contentOffset}
+                alwaysBounceHorizontal={false}
+                contentContainerStyle={style.scrollViewContainer}
+            />
+        )
     }
 
-    // @ts-ignore
-    const animatedBannerImageStyles: StyleProp<ImageStyle> = {
-        transform: [{ translateY: bannerImageTranslateY }],
-        opacity: bannerImageOpacity
+    const renderScene = () => {
+        switch (tabIndex) {
+            case 0: {
+                return (
+                    <OverviewTab mediaItem={mediaItem} />
+                )
+            }
+            default:
+                return null
+        }
     }
-
-    // @ts-ignore
-    const animatedCoverImageStyles: StyleProp<ImageStyle> = {
-        transform: [{ translateY: coverImageTranslateY }],
-        opacity: coverImageOpacity
-    }
-
-    // @ts-ignore   
-    const animatedButtonStyles: StyleProp<ViewStyle> = {
-        transform: [{ translateY: buttonTranslateY }],
-        opacity: buttonOpacity
-    }
-
 
     return (
         <SafeAreaView style={style.screen}>
@@ -137,21 +212,20 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
                     {mediaItem?.title?.userPreferred}
                 </Animated.Text>
 
+                <TabBar
+                    tabRoutes={tabRoutes}
+                    onPressTab={setTabIndex}
+                    selctedTabIndex={tabIndex}
+                />
+
             </Animated.View>
 
-            <Animated.ScrollView
-                bounces={false}
-                style={style.scrollView}
-                contentContainerStyle={style.scrollViewContainer}
-                onScroll={Animated.event(
-                    [{ nativeEvent: { contentOffset: { y: scrollYValue } } }],
-                    { useNativeDriver: true },
-                )}
-            >
+            <ScrollWrapper>
+                {renderScene()}
+            </ScrollWrapper>
 
-            </Animated.ScrollView>
 
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
 
@@ -167,13 +241,10 @@ const styles = (theme: any) => StyleSheet.create({
         zIndex: 1,
         position: "absolute",
         height: HEADER_MAX_HEIGHT,
-    },
-    scrollView: {
-        height: 2000
+        backgroundColor: theme.colors.background,
     },
     scrollViewContainer: {
-        height: 5000,
-        paddingTop: HEADER_MAX_HEIGHT - statusBarHeight,
+        paddingBottom: HEADER_MAX_HEIGHT + 50
     },
     bannerImage: {
         height: BANNER_IMAGE_HEIGHT,
@@ -206,11 +277,10 @@ const styles = (theme: any) => StyleSheet.create({
     title: {
         fontSize: 20,
         fontWeight: "700",
-        position: "absolute",
         left: WINDOW.width / 25,
         color: theme.colors.text,
-        top: BANNER_IMAGE_HEIGHT / 2 + COVER_IMAGE_WIDTH / 0.66 + 15
-    }
+        top: WINDOW.width / 10 + 20
+    },
 });
 
 export default AnimeDetails;
