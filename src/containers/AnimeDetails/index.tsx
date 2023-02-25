@@ -19,6 +19,7 @@ import {
 
 import TabBar from 'components/TabBar';
 import OverviewTab from './Tabs/OverviewTab';
+import CharactersTab from './Tabs/CharactersTab';
 
 
 
@@ -37,6 +38,7 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
             isAdult: mediaItemFromParams?.isAdult,
         }
     })
+
 
     const [tabIndex, setTabIndex] = useState(0)
 
@@ -179,6 +181,11 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
             case 0: {
                 return (
                     <OverviewTab mediaItem={mediaItem} />
+                )
+            }
+            case 1: {
+                return (
+                    <CharactersTab mediaItem={mediaItem} />
                 )
             }
             default:

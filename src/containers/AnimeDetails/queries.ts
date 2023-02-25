@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const GET_MEDIA_DETAILS = gql`
-    query media($id:Int,$type:MediaType,$isAdult:Boolean){
+    query mediaDetails($id:Int,$type:MediaType,$isAdult:Boolean){
         Media(id:$id,type:$type,isAdult:$isAdult){
             id 
             title{userPreferred romaji english native}
@@ -125,3 +125,41 @@ export const GET_MEDIA_DETAILS = gql`
         }
     }
 `
+
+
+export const GET_CHARACTERS = gql`
+    query characters($id:Int,$page:Int){
+        Media(id:$id){
+            id 
+            characters(page:$page,sort:[ROLE,RELEVANCE,ID]){
+                pageInfo{
+                    total 
+                    perPage 
+                    currentPage 
+                    lastPage 
+                    hasNextPage
+                }
+                edges{
+                    id 
+                    role 
+                    name 
+                    voiceActorRoles(sort:[RELEVANCE,ID]){
+                        roleNotes 
+                        dubGroup 
+                        voiceActor{
+                            id 
+                            name{userPreferred}
+                            language:languageV2 
+                            image{large}
+                        }
+                    }
+                    node{
+                        id 
+                        name{userPreferred}
+                        image{large}
+                    }
+                }
+            }
+        }
+    }
+` 

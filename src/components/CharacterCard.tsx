@@ -6,22 +6,17 @@ import { WINDOW } from 'utils/index'
 import useThemedStyles from 'hooks/useThemedStyles'
 
 interface ICharacterCard {
-    character: any
+    imageUri1: any,
+    imageUri2: any,
+    leftMainText: any,
+    leftSubText: any,
+    rightMainText: any,
+    rightSubText: any,
 }
 
-const CharacterCard: FC<ICharacterCard> = ({ character }) => {
+const CharacterCard: FC<ICharacterCard> = ({ imageUri1, imageUri2, leftMainText, leftSubText, rightMainText, rightSubText }) => {
 
     const style = useThemedStyles(styles);
-
-    const imageUri1 = { uri: character?.node?.image?.large }
-    const imageUri2 = { uri: character?.voiceActors[0]?.image?.large }
-
-    const leftMainText = character?.node?.name?.userPreferred
-    const leftSubText = character?.role
-
-    const rightMainText = character?.voiceActors[0]?.name?.userPreferred
-    const rightSubText = character?.voiceActors[0]?.language
-
 
     return (
         <View style={style.container}>
@@ -89,6 +84,7 @@ const styles = (theme: any) => StyleSheet.create({
         marginRight: 5,
         paddingLeft: "47%",
         justifyContent: "space-between",
+        alignItems: "flex-end",
     },
     characterCardMainText: {
         fontSize: 13,

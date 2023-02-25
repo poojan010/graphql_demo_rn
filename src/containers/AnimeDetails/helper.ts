@@ -22,7 +22,6 @@ export const COVER_IMAGE_WIDTH = WINDOW.width / 3.75
 
 export const tabRoutes = [
     { key: 'Overview', title: "Overview" },
-    { key: 'Watch', title: "Watch" },
     { key: 'Characters', title: "Characters" },
     { key: 'Staff', title: "Staff" },
     { key: 'Stats', title: "Stats" },

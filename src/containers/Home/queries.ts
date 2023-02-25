@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 
 export const HOME_DATA = gql`
-    query($season: MediaSeason, $seasonYear: Int, $nextSeason:MediaSeason, $nextYear: Int)  {
+    query homeData($season: MediaSeason, $seasonYear: Int, $nextSeason:MediaSeason, $nextYear: Int)  {
 
         trending:Page(page: 1, perPage: 6) { media(type: ANIME,sort: TRENDING_DESC, isAdult: false) {...media} }
 

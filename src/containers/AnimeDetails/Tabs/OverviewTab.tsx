@@ -74,10 +74,23 @@ const OverviewTab: FC<IOverViewTab> = ({ mediaItem }) => {
     }
 
     const renderCharacter = (item: any, index: number) => {
+        const imageUri1 = { uri: item?.node?.image?.large }
+        const imageUri2 = { uri: item?.voiceActors[0]?.image?.large }
+
+        const leftMainText = item?.node?.name?.userPreferred
+        const leftSubText = item?.role
+
+        const rightMainText = item?.voiceActors[0]?.name?.userPreferred
+        const rightSubText = item?.voiceActors[0]?.language
         return (
             <CharacterCard
-                character={item}
+                imageUri1={imageUri1}
+                imageUri2={imageUri2}
                 key={index.toString()}
+                leftSubText={leftSubText}
+                leftMainText={leftMainText}
+                rightSubText={rightSubText}
+                rightMainText={rightMainText}
             />
         )
     }
