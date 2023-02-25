@@ -12,16 +12,20 @@ const constants = {
 
     animeDetails: {
         addToList: "Add to List",
+        loadMore: "Load More",
         description: "Description",
         characters: "Characters",
         recommendations: "Recommendations",
         relations: "Relations",
+        recentActivity: "Recent Activity"
     },
 
     screens: {
         home: "Home",
         animeDetails: "AnimeDetails"
     },
+
+    of: "of"
 }
 
 export default constants

@@ -190,3 +190,41 @@ export const GET_STAFF = gql`
         }
     }
 `
+
+
+export const GET_ACTIVITIES = gql`
+    query($id:Int,$page:Int){
+        Page(page:$page,perPage:40){
+            pageInfo{
+                total 
+                perPage 
+                currentPage 
+                lastPage 
+                hasNextPage
+            }
+            activities(mediaId:$id,sort:ID_DESC,type:MEDIA_LIST){... on 
+                ListActivity{
+                    id 
+                    userId 
+                    type 
+                    status
+                    progress 
+                    replyCount 
+                    isLocked 
+                    isSubscribed 
+                    isLiked 
+                    likeCount 
+                    createdAt 
+                    user{id name avatar{large}}
+                    media{
+                        id 
+                        type 
+                        bannerImage 
+                        title{userPreferred}
+                        coverImage{large}
+                    }
+                }
+            }
+        }
+    }
+`

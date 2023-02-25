@@ -71,9 +71,27 @@ const cache = new InMemoryCache({
                     },
                 },
 
-
                 coverImage: {
-                    keyArgs: false,
+                    keyArgs: ["id"],
+                    merge: true
+                },
+                title: {
+                    keyArgs: ["id"],
+                    merge: true
+                }
+            }
+        },
+        Page: {
+            fields: {
+                activities: {
+                    keyArgs: ["ListActivity.id"],
+
+                    merge(existing = [], incoming) {
+                        return [...existing, ...incoming]
+                    }
+                },
+                pageInfo: {
+                    keyArgs: ["id"],
                     merge: true
                 }
             }
