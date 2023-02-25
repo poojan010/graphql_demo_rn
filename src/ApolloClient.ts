@@ -8,15 +8,11 @@ const httpLink = createHttpLink({
     uri: END_POINT
 });
 
-const token = ""
-
 
 /** Add Token in middleware */
 const authLink = setContext((_, { headers }) => {
     return {
-        headers: {
-            ...headers,
-        }
+        headers
     }
 });
 
@@ -51,6 +47,31 @@ const cache = new InMemoryCache({
                         }
                     },
                 },
+                staff: {
+                    keyArgs: ["id"],
+
+                    merge(existing = {}, incoming) {
+                        /* Storing Staffs for Staff Tab. (1st Page) */
+                        if (!(existing?.pageInfo)) {
+                            return incoming
+                        }
+                        /* Storing Staffs for Staff Tab. (> 1 Page) */
+                        else {
+                            if (existing.pageInfo?.hasNextPage === true) {
+                                return {
+                                    ...incoming,
+                                    edges: [...existing.edges, ...incoming.edges]
+                                }
+                            }
+
+                            else {
+                                return existing;
+                            }
+                        }
+                    },
+                },
+
+
                 coverImage: {
                     keyArgs: false,
                     merge: true

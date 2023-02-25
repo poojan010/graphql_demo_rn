@@ -14,11 +14,11 @@ const screenConstants = constants.animeDetails
 
 
 
-interface IOverViewTab {
+interface ICharactersTab {
     mediaItem: any
 }
 
-const CharactersTab: FC<IOverViewTab> = ({ mediaItem }) => {
+const CharactersTab: FC<ICharactersTab> = ({ mediaItem }) => {
     const style = useThemedStyles(styles);
 
     const { loading, refetch, data, error, fetchMore } = useQuery(GET_CHARACTERS, {
@@ -50,7 +50,7 @@ const CharactersTab: FC<IOverViewTab> = ({ mediaItem }) => {
     }
 
 
-    const renderCharacter = ({ item, index }: any) => {
+    const renderCharacter = ({ item, index }: { item: any, index: number }) => {
 
         const imageUri1 = { uri: item?.node?.image?.large }
         const imageUri2 = { uri: item?.voiceActorRoles[0]?.voiceActor?.image?.large }

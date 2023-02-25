@@ -162,4 +162,31 @@ export const GET_CHARACTERS = gql`
             }
         }
     }
-` 
+`
+
+
+export const GET_STAFF = gql`
+    query staff($id:Int,$page:Int){
+        Media(id:$id){
+            id 
+            staff(page:$page,sort:[RELEVANCE,ID]){
+                pageInfo{
+                    total 
+                    perPage 
+                    currentPage 
+                    lastPage 
+                    hasNextPage
+                }
+                edges{
+                    id 
+                    role 
+                    node{
+                        id 
+                        name{userPreferred}
+                        image{large}
+                    }
+                }
+            }
+        }
+    }
+`

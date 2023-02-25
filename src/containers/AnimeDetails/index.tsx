@@ -18,6 +18,7 @@ import {
 } from './helper';
 
 import TabBar from 'components/TabBar';
+import StaffTab from './Tabs/StaffTab';
 import OverviewTab from './Tabs/OverviewTab';
 import CharactersTab from './Tabs/CharactersTab';
 
@@ -186,6 +187,11 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
             case 1: {
                 return (
                     <CharactersTab mediaItem={mediaItem} />
+                )
+            }
+            case 2: {
+                return (
+                    <StaffTab mediaItem={mediaItem} />
                 )
             }
             default:
