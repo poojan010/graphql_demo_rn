@@ -7,9 +7,10 @@ import { WINDOW } from "utils/index"
 export const statusBarHeight = StatusBar?.currentHeight ? StatusBar.currentHeight : 55
 
 
-export const HEADER_MAX_HEIGHT = WINDOW.height / 2.45
+export const TAB_BAR_HEIGHT = 48
+export const HEADER_MAX_HEIGHT = WINDOW.height / 2.75
 export const HEADER_MIN_HEIGHT = WINDOW.height / 5.5
-export const HEADER_HEIGHT_DIFF = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT
+export const HEADER_HEIGHT_DIFF = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT + TAB_BAR_HEIGHT
 
 
 
@@ -36,37 +37,37 @@ export const interpolateHeader = {
 }
 
 export const interpolateBannerY = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [0, 100],
     extrapolate: Extrapolation.CLAMP
 }
 
 export const interpolateBannerOpacity = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [1, 0],
     extrapolate: Extrapolation.CLAMP
 }
 
 export const interpolateCoverY = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [0, -10],
     extrapolate: Extrapolation.CLAMP
 }
 
 export const interpolateCoverOpacity = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [1, 0],
     extrapolate: Extrapolation.CLAMP
 }
 
 export const interpolateButtonY = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [0, -10],
     extrapolate: Extrapolation.CLAMP
 }
 
 export const interpolateButtonOpacity = {
-    inputRange: [0, HEADER_HEIGHT_DIFF],
+    inputRange: [0, -HEADER_HEIGHT_DIFF],
     outputRange: [1, 0],
     extrapolate: Extrapolation.CLAMP
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { LogBox } from 'react-native';
 import { ApolloProvider } from '@apollo/client';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
@@ -7,6 +8,11 @@ import Routers from './navigator';
 import ThemeProvider from './theme/ThemeProvider';
 
 import { HelperButton } from './components';
+
+
+const victoryNativeWarning = "Require cycle: node_modules/victory"
+
+LogBox.ignoreLogs([victoryNativeWarning]);
 
 
 const App = () => (

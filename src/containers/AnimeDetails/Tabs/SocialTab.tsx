@@ -1,4 +1,4 @@
-import React, { FC } from 'react'
+import React, { FC, forwardRef } from 'react'
 import { useQuery } from '@apollo/client';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -10,6 +10,7 @@ import ListFooterLoader from 'components/ActivityIndicator';
 import { GET_ACTIVITIES } from '../queries';
 
 import constants from 'constants/index';
+import Animated from 'react-native-reanimated';
 const screenConstants = constants.animeDetails
 
 
@@ -26,10 +27,13 @@ const LoadMoreButton = ({ onPress }: { onPress: any }) => {
 }
 
 interface ISocialTab {
-    mediaItem: any
+    mediaItem: any,
+    onScroll: any,
+    onScrollEndDrag: any,
+    onMomentumScrollEnd: any,
 }
 
-const SocialTab: FC<ISocialTab> = ({ mediaItem }) => {
+const SocialTab = forwardRef<FlatList, ISocialTab>(({ mediaItem, ...restProps }, ref) => {
     const style = useThemedStyles(styles);
 
     const { loading, refetch, data, error, fetchMore } = useQuery(GET_ACTIVITIES, {
@@ -51,8 +55,6 @@ const SocialTab: FC<ISocialTab> = ({ mediaItem }) => {
 
 
     const loadMoreData = () => {
-        console.log("called", pageInfo?.hasNextPage);
-
         if (pageInfo?.hasNextPage === true) {
             fetchMore({
                 variables: {
@@ -84,23 +86,32 @@ const SocialTab: FC<ISocialTab> = ({ mediaItem }) => {
         else return null
     }
 
+    const renderHeaderComponent = () => {
+        return (
+            <Text style={style.sectionTitle}>
+                {screenConstants.recentActivity}
+            </Text>
+        )
+    }
+
 
     return (
         <View style={style.container}>
 
-            <Text style={style.sectionTitle}>
-                {screenConstants.recentActivity}
-            </Text>
-
-            <FlatList
-                data={activities}
+            <Animated.FlatList
+                data={activities} //@ts-ignore
+                ref={ref}
+                {...restProps}
+                bounces={false}
+                scrollEventThrottle={16}
                 renderItem={renderThread}
+                ListHeaderComponent={renderHeaderComponent}
                 ListFooterComponent={renderFooterComponent}
             />
 
         </View>
     )
-}
+})
 
 export default SocialTab
 

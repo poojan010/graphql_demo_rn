@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
+import React, { forwardRef } from 'react'
 import { useQuery } from '@apollo/client';
+import Animated from 'react-native-reanimated';
 import { FlatList, StyleSheet, View } from 'react-native';
 
 import useThemedStyles from 'hooks/useThemedStyles';
@@ -10,12 +11,14 @@ import ListFooterLoader from 'components/ActivityIndicator';
 import { GET_STAFF } from '../queries';
 
 
-
 interface IStaffTab {
-    mediaItem: any
+    mediaItem: any,
+    onScroll: any,
+    onScrollEndDrag: any,
+    onMomentumScrollEnd: any,
 }
 
-const StaffTab: FC<IStaffTab> = ({ mediaItem }) => {
+const StaffTab = forwardRef<FlatList, IStaffTab>(({ mediaItem, ...restProps }, ref) => {
     const style = useThemedStyles(styles);
 
     const { loading, refetch, data, error, fetchMore } = useQuery(GET_STAFF, {
@@ -76,8 +79,12 @@ const StaffTab: FC<IStaffTab> = ({ mediaItem }) => {
     return (
         <View style={style.container}>
 
-            <FlatList
-                data={staff}
+            <Animated.FlatList
+                data={staff} //@ts-ignore
+                ref={ref}
+                bounces={false}
+                {...restProps}
+                scrollEventThrottle={16}
                 renderItem={renderStaff}
                 onEndReached={onEndReached}
                 ListFooterComponent={renderFooterComponent}
@@ -85,7 +92,7 @@ const StaffTab: FC<IStaffTab> = ({ mediaItem }) => {
 
         </View>
     )
-}
+})
 
 export default StaffTab
 

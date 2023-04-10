@@ -1,34 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useQuery } from '@apollo/client';
+import { StyleSheet, View } from 'react-native';
+import { TabBarItem, TabView, TabBar } from 'react-native-tab-view';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { SafeAreaView, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import Animated, { interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { interpolate, useAnimatedStyle, } from 'react-native-reanimated';
 
 import { WINDOW } from 'utils/index';
-import constants from 'constants/index';
+import useTheme from 'hooks/useTheme';
 import useThemedStyles from 'hooks/useThemedStyles';
 import RouteParamsList from 'navigator/routeParams';
 
 import { GET_MEDIA_DETAILS } from './queries';
 
 import {
-    tabRoutes, BANNER_IMAGE_HEIGHT, COVER_IMAGE_WIDTH, HEADER_MAX_HEIGHT,
-    interpolateHeader, interpolateBannerOpacity, interpolateBannerY, interpolateCoverY,
-    interpolateCoverOpacity, interpolateButtonY, interpolateButtonOpacity, interpolateScrollViewY,
+    tabRoutes, HEADER_MAX_HEIGHT,
+    interpolateBannerOpacity, interpolateBannerY, interpolateCoverY,
+    interpolateCoverOpacity, interpolateButtonY, interpolateButtonOpacity,
 } from './helper';
 
-import TabBar from 'components/TabBar';
+import Header from './Header';
+import StatsTab from './Tabs/StatsTab';
 import StaffTab from './Tabs/StaffTab';
 import SocialTab from './Tabs/SocialTab';
 import OverviewTab from './Tabs/OverviewTab';
 import CharactersTab from './Tabs/CharactersTab';
 
+import useScrollAnimationHandler from './hooks/useScrollAnimationHandler'
 
 
 interface ScreenProps extends NativeStackScreenProps<RouteParamsList, "AnimeDetails"> { }
 
 const AnimeDetails: React.FC<ScreenProps> = (props) => {
 
+    const theme = useTheme()
     const style = useThemedStyles(styles);
 
     const { route: { params: { mediaItem: mediaItemFromParams } } } = props
@@ -41,51 +45,36 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
         }
     })
 
-
-    const [tabIndex, setTabIndex] = useState(0)
-
     const mediaItem = loading || error
         ? mediaItemFromParams
         : data.Media
 
 
-    const bannerImageSource = { uri: mediaItem.bannerImage }
-    const coverImageSource = { uri: mediaItem?.coverImage?.large }
+    const { tabIndex, setTabIndex, tabProps, translateY } = useScrollAnimationHandler()
+
+    const tabNavigationState = { index: tabIndex, routes: tabRoutes }
 
 
-    const scrollYValue = useSharedValue(0)
+    const tabViewAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: translateY.value }],
+    }));
 
-    const scrollHandler = useAnimatedScrollHandler((event) => {
-        scrollYValue.value = event.contentOffset.y;
-    });
-
-
-    /* Styles */
-    const headerAnimatedStyles = useAnimatedStyle(() => {
-        return {
-            transform: [{
-                translateY: interpolate(
-                    scrollYValue.value,
-                    interpolateHeader.inputRange,
-                    interpolateHeader.outputRange,
-                    interpolateHeader.extrapolate,
-                )
-            }],
-        };
-    });
+    const headerAnimatedStyle = useAnimatedStyle(() => ({
+        transform: [{ translateY: translateY.value }],
+    }));
 
     const animatedBannerImageStyles = useAnimatedStyle(() => {
         return {
             transform: [{
                 translateY: interpolate(
-                    scrollYValue.value,
+                    translateY.value,
                     interpolateBannerY.inputRange,
                     interpolateBannerY.outputRange,
                     interpolateBannerY.extrapolate
                 )
             }],
             opacity: interpolate(
-                scrollYValue.value,
+                translateY.value,
                 interpolateBannerOpacity.inputRange,
                 interpolateBannerOpacity.outputRange,
                 interpolateBannerOpacity.extrapolate
@@ -98,7 +87,7 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
         return {
             transform: [{
                 translateY: interpolate(
-                    scrollYValue.value,
+                    translateY.value,
                     interpolateCoverY.inputRange,
                     interpolateCoverY.outputRange,
                     interpolateCoverY.extrapolate
@@ -106,7 +95,7 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
 
             }],
             opacity: interpolate(
-                scrollYValue.value,
+                translateY.value,
                 interpolateCoverOpacity.inputRange,
                 interpolateCoverOpacity.outputRange,
                 interpolateCoverOpacity.extrapolate
@@ -118,14 +107,14 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
         return {
             transform: [{
                 translateY: interpolate(
-                    scrollYValue.value,
+                    translateY.value,
                     interpolateButtonY.inputRange,
                     interpolateButtonY.outputRange,
                     interpolateButtonY.extrapolate
                 )
             }],
             opacity: interpolate(
-                scrollYValue.value,
+                translateY.value,
                 interpolateButtonOpacity.inputRange,
                 interpolateButtonOpacity.outputRange,
                 interpolateButtonOpacity.extrapolate
@@ -133,118 +122,108 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
         };
     });
 
-    const animatedScollViewStyles = useAnimatedStyle(() => {
-        return {
-            transform: [{
-                translateY: interpolate(
-                    scrollYValue.value,
-                    interpolateScrollViewY.inputRange,
-                    interpolateScrollViewY.outputRange,
-                    interpolateScrollViewY.extrapolate
-                )
-            }],
-        };
-    });
+
+    const tabViewProps = {
+        lazy: true,
+        swipeEnabled: true,
+        initialLayout: { width: WINDOW.width },
+    }
+
+    const tabBarProps = {
+        bounces: false,
+        pressColor: 'transparent',
+        activeColor: theme.colors.text,
+        inactiveColor: theme.colors.secondary,
+        style: style.tabViewStyle,
+        labelStyle: style.labelStyle,
+    }
 
 
-
-    const ScrollWrapper = ({ children }: { children: any }) => {
-        const contentOffset = {
-            x: 0,
-            y: scrollYValue.value
-        }
-
-        const renderItem = ({ item, index }: any) => (
-            <Animated.View style={[animatedScollViewStyles]}>
-                {children}
-            </Animated.View>
-        )
-
+    const renderTabBarItem = (props: any) => {
         return (
-            <Animated.FlatList
-                data={[""]}
-                bounces={false}
-                renderItem={renderItem}
-                scrollEventThrottle={1}
-                onScroll={scrollHandler}
-                decelerationRate={'fast'}
-                ListEmptyComponent={null}
-                nestedScrollEnabled={true}
-                alwaysBounceVertical={false}
-                contentOffset={contentOffset}
-                alwaysBounceHorizontal={false}
-                contentContainerStyle={style.scrollViewContainer}
+            <TabBarItem
+                {...props}
+                labelStyle={style.labelStyle}
             />
         )
     }
 
-    const renderScene = () => {
-        switch (tabIndex) {
-            case 0: {
+    const renderTabBar = (props: any) => {
+        return (
+            <View>
+                <TabBar
+                    {...props}
+                    {...tabBarProps}
+                    scrollEnabled={true}
+                    renderTabBarItem={renderTabBarItem}
+                />
+            </View>
+        )
+    }
+
+
+    const renderScene = ({ route }: { route: { key: string } }) => {
+        switch (route.key) {
+            case 'Overview':
                 return (
-                    <OverviewTab mediaItem={mediaItem} />
+                    <OverviewTab
+                        {...tabProps[0]}
+                        mediaItem={mediaItem}
+                    />
                 )
-            }
-            case 1: {
+            case 'Characters':
                 return (
-                    <CharactersTab mediaItem={mediaItem} />
+                    <CharactersTab
+                        {...tabProps[1]}
+                        mediaItem={mediaItem}
+                    />
                 )
-            }
-            case 2: {
+            case 'Staff':
                 return (
-                    <StaffTab mediaItem={mediaItem} />
+                    <StaffTab
+                        {...tabProps[2]}
+                        mediaItem={mediaItem}
+                    />
                 )
-            }
-            case 4: {
+            case 'Stats':
                 return (
-                    <SocialTab mediaItem={mediaItem} />
+                    <StatsTab
+                        {...tabProps[3]}
+                        mediaItem={mediaItem}
+                    />
                 )
-            }
+            case 'Social':
+                return (
+                    <SocialTab
+                        {...tabProps[4]}
+                        mediaItem={mediaItem}
+                    />
+                )
             default:
                 return null
         }
     }
 
     return (
-        <SafeAreaView style={style.screen}>
-
-            <Animated.View style={[style.header, headerAnimatedStyles]}>
-
-                <Animated.Image
-                    source={bannerImageSource}
-                    style={[style.bannerImage, animatedBannerImageStyles]}
+        <View style={style.screen}>
+            <Animated.View style={[style.tabViewWraperStyle, tabViewAnimatedStyle]}>
+                <TabView
+                    {...tabViewProps}
+                    lazy={false}
+                    renderScene={renderScene}
+                    renderTabBar={renderTabBar}
+                    onIndexChange={setTabIndex}
+                    navigationState={tabNavigationState}
                 />
-                <Animated.Image
-                    source={coverImageSource}
-                    style={[style.coverImage, animatedCoverImageStyles]}
-                />
-
-                <Animated.View style={[style.addToListButtonView, animatedButtonStyles]} >
-                    <TouchableOpacity style={style.addToListButton}>
-                        <Text style={style.addToListButtonText}>
-                            {constants.animeDetails.addToList}
-                        </Text>
-                    </TouchableOpacity>
-                </Animated.View>
-
-                <Animated.Text numberOfLines={1} style={[style.title]}>
-                    {mediaItem?.title?.userPreferred}
-                </Animated.Text>
-
-                <TabBar
-                    tabRoutes={tabRoutes}
-                    onPressTab={setTabIndex}
-                    selctedTabIndex={tabIndex}
-                />
-
             </Animated.View>
-
-            <ScrollWrapper>
-                {renderScene()}
-            </ScrollWrapper>
-
-
-        </SafeAreaView >
+            <Header
+                mediaItem={mediaItem}
+                buttonStyle={animatedButtonStyles}
+                headerStyle={headerAnimatedStyle}
+                coverImageStyle={animatedCoverImageStyles}
+                bannerImageStyle={animatedBannerImageStyles}
+            />
+        </View>
     );
 };
 
@@ -253,52 +232,17 @@ const styles = (theme: any) => StyleSheet.create({
         flex: 1,
         backgroundColor: theme.colors.background,
     },
-    header: {
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1,
-        position: "absolute",
-        height: HEADER_MAX_HEIGHT,
-        backgroundColor: theme.colors.background,
+    tabViewWraperStyle: {
+        flex: 1,
+        top: HEADER_MAX_HEIGHT,
     },
-    scrollViewContainer: {
-        paddingBottom: HEADER_MAX_HEIGHT + 50
+    tabViewStyle: {
+        backgroundColor: 'transparent',
+        shadowColor: 'transparent',
+        marginHorizontal: (15),
     },
-    bannerImage: {
-        height: BANNER_IMAGE_HEIGHT,
-    },
-    coverImage: {
-        aspectRatio: 0.66,
-        position: 'absolute',
-        width: COVER_IMAGE_WIDTH,
-        left: WINDOW.width / 25,
-        top: BANNER_IMAGE_HEIGHT / 2,
-    },
-    addToListButtonView: {
-        position: "absolute",
-        left: COVER_IMAGE_WIDTH + WINDOW.width / 12.5,
-        top: BANNER_IMAGE_HEIGHT / 2 + COVER_IMAGE_WIDTH / 0.66 - WINDOW.width / 10
-    },
-    addToListButton: {
-        backgroundColor: "#1F51FF",
-        width: WINDOW.width / 1.65,
-        justifyContent: "center",
-        alignItems: "center",
-        height: WINDOW.width / 10,
-        borderRadius: 5
-    },
-    addToListButtonText: {
-        color: "white",
-        fontSize: 16,
-        fontWeight: "500"
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: "700",
-        left: WINDOW.width / 25,
-        color: theme.colors.text,
-        top: WINDOW.width / 10 + 20
+    labelStyle: {
+        textTransform: 'capitalize',
     },
 });
 

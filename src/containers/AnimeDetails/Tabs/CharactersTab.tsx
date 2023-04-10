@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
 import { useQuery } from '@apollo/client';
+import React, { forwardRef } from 'react'
+import Animated from 'react-native-reanimated';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import useThemedStyles from 'hooks/useThemedStyles';
@@ -10,15 +11,20 @@ import ListFooterLoader from 'components/ActivityIndicator';
 import { GET_CHARACTERS } from '../queries';
 
 import constants from 'constants/index';
+
 const screenConstants = constants.animeDetails
 
 
 
 interface ICharactersTab {
-    mediaItem: any
+    mediaItem: any,
+    onScroll: any,
+    onScrollEndDrag: any,
+    onMomentumScrollEnd: any,
 }
 
-const CharactersTab: FC<ICharactersTab> = ({ mediaItem }) => {
+const CharactersTab = forwardRef<FlatList, ICharactersTab>(({ mediaItem, ...restProps }, ref) => {
+
     const style = useThemedStyles(styles);
 
     const { loading, refetch, data, error, fetchMore } = useQuery(GET_CHARACTERS, {
@@ -31,7 +37,6 @@ const CharactersTab: FC<ICharactersTab> = ({ mediaItem }) => {
     const characters = data?.Media?.characters?.edges
         ? data?.Media?.characters?.edges
         : []
-
 
     const pageInfo = data?.Media?.characters?.pageInfo
         ? data?.Media?.characters?.pageInfo
@@ -83,25 +88,32 @@ const CharactersTab: FC<ICharactersTab> = ({ mediaItem }) => {
         else return null
     }
 
-
-    return (
-        <View style={style.container}>
-
+    const renderHeaderComponent = () => {
+        return (
             <Text style={style.sectionTitle}>
                 {screenConstants.characters}
             </Text>
+        )
+    }
 
 
-            <FlatList
+    return (
+        <View style={style.container}>
+            <Animated.FlatList //@ts-ignore
+                ref={ref}
                 data={characters}
+                bounces={false}
+                {...restProps}
+                scrollEventThrottle={16}
                 renderItem={renderCharacter}
                 onEndReached={onEndReached}
+                ListHeaderComponent={renderHeaderComponent}
                 ListFooterComponent={renderFooterComponent}
             />
 
         </View>
     )
-}
+})
 
 export default CharactersTab
 

@@ -1,6 +1,7 @@
-import React, { FC } from 'react'
+import React, { FC, forwardRef } from 'react'
 import RenderHtml from 'react-native-render-html';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated from 'react-native-reanimated';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { WINDOW } from 'utils/index';
 
@@ -12,6 +13,7 @@ import CharacterCard from 'components/CharacterCard';
 import RecommendationCard from 'components/RecommendationCard';
 
 import constants from 'constants/index';
+
 const screenConstants = constants.animeDetails
 
 const descriptionHtmlWidth = WINDOW.width - 20
@@ -37,10 +39,13 @@ const HorizontalList = ({ data, title, renderItem }: { data: any[], title: strin
 }
 
 interface IOverViewTab {
-    mediaItem: any
+    mediaItem: any,
+    onScroll: any,
+    onScrollEndDrag: any,
+    onMomentumScrollEnd: any,
 }
 
-const OverviewTab: FC<IOverViewTab> = ({ mediaItem }) => {
+const OverviewTab = forwardRef<FlatList, IOverViewTab>(({ mediaItem, ...restProps }, ref) => {
 
     const theme = useTheme()
     const style = useThemedStyles(styles);
@@ -97,44 +102,54 @@ const OverviewTab: FC<IOverViewTab> = ({ mediaItem }) => {
 
 
     return (
-        <View style={style.container}>
+        <Animated.FlatList
+            data={[""]} //@ts-ignore
+            ref={ref}
+            {...restProps}
+            bounces={false}
+            style={style.container}
+            scrollEventThrottle={16}
+            renderItem={() => {
+                return (
+                    <>
+                        <Text style={style.sectionTitle}>
+                            {screenConstants.description}
+                        </Text>
+                        <View style={style.descriptionBox}>
+                            <RenderHtml
+                                source={descriptionHtml}
+                                contentWidth={descriptionHtmlWidth}
+                            />
+                        </View>
 
-            <Text style={style.sectionTitle}>
-                {screenConstants.description}
-            </Text>
-            <View style={style.descriptionBox}>
-                <RenderHtml
-                    source={descriptionHtml}
-                    contentWidth={descriptionHtmlWidth}
-                />
-            </View>
+                        <HorizontalList
+                            data={relations}
+                            renderItem={renderRelation}
+                            title={screenConstants.relations}
+                        />
 
-            <HorizontalList
-                data={relations}
-                renderItem={renderRelation}
-                title={screenConstants.relations}
-            />
+                        <Text style={style.sectionTitle}>
+                            {screenConstants.characters}
+                        </Text>
+                        {characters?.map(renderCharacter)}
 
-            <Text style={style.sectionTitle}>
-                {screenConstants.characters}
-            </Text>
-            {characters?.map(renderCharacter)}
-
-            <HorizontalList
-                data={recommendations}
-                renderItem={renderRecommendation}
-                title={screenConstants.recommendations}
-            />
-
-        </View>
+                        <HorizontalList
+                            data={recommendations}
+                            renderItem={renderRecommendation}
+                            title={screenConstants.recommendations}
+                        />
+                    </>
+                )
+            }}
+        />
     )
-}
+})
 
 export default OverviewTab
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
     },
     descriptionTitle: {
         fontSize: 14,
