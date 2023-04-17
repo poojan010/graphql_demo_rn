@@ -6,10 +6,13 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import useThemedStyles from 'hooks/useThemedStyles';
 
 import StaffCard from 'components/StaffCard';
+import InfoContainer from '../InfoContainer';
 import ListFooterLoader from 'components/ActivityIndicator';
 
 import { GET_STAFF } from '../queries';
 
+import { WINDOW } from 'utils/index';
+import { HEADER_MIN_HEIGHT } from '../helper';
 
 interface IStaffTab {
     mediaItem: any,
@@ -69,28 +72,36 @@ const StaffTab = forwardRef<FlatList, IStaffTab>(({ mediaItem, ...restProps }, r
     const renderFooterComponent = () => {
         if (pageInfo?.hasNextPage === true) {
             return (
-                <ListFooterLoader />
+                <>
+                    <ListFooterLoader />
+                    <View style={style.bottomSpace} />
+                </>
             )
         }
-        else return null
+        else return <View style={style.bottomSpace} />
+    }
+
+
+    const renderHeaderComponent = () => {
+        return (
+            <InfoContainer mediaItem={mediaItem} />
+        )
     }
 
 
     return (
-        <View style={style.container}>
-
-            <Animated.FlatList
-                data={staff} //@ts-ignore
-                ref={ref}
-                bounces={false}
-                {...restProps}
-                scrollEventThrottle={16}
-                renderItem={renderStaff}
-                onEndReached={onEndReached}
-                ListFooterComponent={renderFooterComponent}
-            />
-
-        </View>
+        <Animated.FlatList
+            data={staff} //@ts-ignore
+            ref={ref}
+            bounces={false}
+            {...restProps}
+            scrollEventThrottle={16}
+            renderItem={renderStaff}
+            onEndReached={onEndReached}
+            contentContainerStyle={style.container}
+            ListFooterComponent={renderFooterComponent}
+            ListHeaderComponent={renderHeaderComponent}
+        />
     )
 })
 
@@ -98,6 +109,10 @@ export default StaffTab
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        minHeight: WINDOW.height
     },
+    bottomSpace: {
+        height: HEADER_MIN_HEIGHT
+    }
 })

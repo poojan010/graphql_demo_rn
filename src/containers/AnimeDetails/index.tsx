@@ -132,10 +132,10 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
     const tabBarProps = {
         bounces: false,
         pressColor: 'transparent',
-        activeColor: theme.colors.text,
-        inactiveColor: theme.colors.secondary,
+        activeColor: theme.colors.secondary,
+        inactiveColor: theme.colors.text,
         style: style.tabViewStyle,
-        labelStyle: style.labelStyle,
+        indicatorStyle: style.indicatorStyle
     }
 
 
@@ -143,6 +143,7 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
         return (
             <TabBarItem
                 {...props}
+                style={style.tabItemStyle}
                 labelStyle={style.labelStyle}
             />
         )
@@ -155,6 +156,7 @@ const AnimeDetails: React.FC<ScreenProps> = (props) => {
                     {...props}
                     {...tabBarProps}
                     scrollEnabled={true}
+                    tabStyle={style.tabBarStyle}
                     renderTabBarItem={renderTabBarItem}
                 />
             </View>
@@ -243,7 +245,20 @@ const styles = (theme: any) => StyleSheet.create({
     },
     labelStyle: {
         textTransform: 'capitalize',
+        fontWeight: "500",
+        color: "red",
+        fontSize: 13.5
     },
+    tabItemStyle: {
+        height: 45
+    },
+    tabBarStyle: {
+        width: 'auto',
+    },
+    indicatorStyle: {
+        height: 2,
+        backgroundColor: theme.colors.secondary
+    }
 });
 
 export default AnimeDetails;

@@ -4,10 +4,12 @@ import Animated from 'react-native-reanimated';
 import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { WINDOW } from 'utils/index';
+import { HEADER_MIN_HEIGHT } from '../helper';
 
 import useTheme from 'hooks/useTheme';
 import useThemedStyles from 'hooks/useThemedStyles';
 
+import InfoContainer from '../InfoContainer';
 import RelationCard from 'components/RelationCard';
 import CharacterCard from 'components/CharacterCard';
 import RecommendationCard from 'components/RecommendationCard';
@@ -109,9 +111,12 @@ const OverviewTab = forwardRef<FlatList, IOverViewTab>(({ mediaItem, ...restProp
             bounces={false}
             style={style.container}
             scrollEventThrottle={16}
+            contentContainerStyle={style.container}
             renderItem={() => {
                 return (
                     <>
+                        <InfoContainer mediaItem={mediaItem} />
+
                         <Text style={style.sectionTitle}>
                             {screenConstants.description}
                         </Text>
@@ -138,6 +143,8 @@ const OverviewTab = forwardRef<FlatList, IOverViewTab>(({ mediaItem, ...restProp
                             renderItem={renderRecommendation}
                             title={screenConstants.recommendations}
                         />
+
+                        <View style={style.bottomSpace} />
                     </>
                 )
             }}
@@ -150,6 +157,7 @@ export default OverviewTab
 const styles = (theme: any) => StyleSheet.create({
     container: {
         marginHorizontal: 10,
+        minHeight: WINDOW.height
     },
     descriptionTitle: {
         fontSize: 14,
@@ -174,5 +182,8 @@ const styles = (theme: any) => StyleSheet.create({
     },
     horizontalListContainer: {
         alignItems: "flex-start"
+    },
+    bottomSpace: {
+        height: HEADER_MIN_HEIGHT
     }
 })

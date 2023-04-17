@@ -3,8 +3,11 @@ import React, { forwardRef } from 'react'
 import Animated from 'react-native-reanimated';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
+import { HEADER_MIN_HEIGHT } from '../helper';
+
 import useThemedStyles from 'hooks/useThemedStyles';
 
+import InfoContainer from '../InfoContainer';
 import CharacterCard from 'components/CharacterCard';
 import ListFooterLoader from 'components/ActivityIndicator';
 
@@ -12,8 +15,9 @@ import { GET_CHARACTERS } from '../queries';
 
 import constants from 'constants/index';
 
-const screenConstants = constants.animeDetails
 
+
+const screenConstants = constants.animeDetails
 
 
 interface ICharactersTab {
@@ -82,36 +86,40 @@ const CharactersTab = forwardRef<FlatList, ICharactersTab>(({ mediaItem, ...rest
     const renderFooterComponent = () => {
         if (pageInfo?.hasNextPage === true) {
             return (
-                <ListFooterLoader />
+                <>
+                    <ListFooterLoader />
+                    <View style={style.bottomSpace} />
+                </>
             )
         }
-        else return null
+        else return <View style={style.bottomSpace} />
     }
 
     const renderHeaderComponent = () => {
         return (
-            <Text style={style.sectionTitle}>
-                {screenConstants.characters}
-            </Text>
+            <>
+                <InfoContainer mediaItem={mediaItem} />
+                <Text style={style.sectionTitle}>
+                    {screenConstants.characters}
+                </Text>
+            </>
         )
     }
 
 
     return (
-        <View style={style.container}>
-            <Animated.FlatList //@ts-ignore
-                ref={ref}
-                data={characters}
-                bounces={false}
-                {...restProps}
-                scrollEventThrottle={16}
-                renderItem={renderCharacter}
-                onEndReached={onEndReached}
-                ListHeaderComponent={renderHeaderComponent}
-                ListFooterComponent={renderFooterComponent}
-            />
-
-        </View>
+        <Animated.FlatList //@ts-ignore
+            ref={ref}
+            data={characters}
+            bounces={false}
+            {...restProps}
+            scrollEventThrottle={16}
+            renderItem={renderCharacter}
+            onEndReached={onEndReached}
+            contentContainerStyle={style.container}
+            ListHeaderComponent={renderHeaderComponent}
+            ListFooterComponent={renderFooterComponent}
+        />
     )
 })
 
@@ -119,7 +127,8 @@ export default CharactersTab
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        // minHeight: WINDOW.height
     },
     sectionTitle: {
         fontSize: 14,
@@ -127,4 +136,7 @@ const styles = (theme: any) => StyleSheet.create({
         color: theme.colors.text,
         marginTop: 20
     },
+    bottomSpace: {
+        height: HEADER_MIN_HEIGHT
+    }
 })

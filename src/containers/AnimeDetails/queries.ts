@@ -122,6 +122,8 @@ export const GET_MEDIA_DETAILS = gql`
             stats{
                 statusDistribution{status amount}
             }
+            nextAiringEpisode{airingAt timeUntilAiring episode}
+            studios{edges{isMain node{id name}}}
         }
     }
 `

@@ -20,6 +20,27 @@ const constants = {
         recentActivity: "Recent Activity"
     },
 
+    mediaInfoContainer: {
+        airing: "Airing",
+        format: "Format",
+        duration: "Episode Duration",
+        status: "Status",
+        startDate: "Start Date",
+        season: "Season",
+        averageScore: "Average Score",
+        meanScore: "Mean Score",
+        popularity: "Popularity",
+        favourites: "Favourites",
+        studios: "Studios",
+        producers: "Producers",
+        source: "Source",
+        hashtag: "Hashtag",
+        genres: "Genres",
+        romaji: "Romaji",
+        english: "English",
+        native: "Native",
+    },
+
     screens: {
         home: "Home",
         animeDetails: "AnimeDetails"

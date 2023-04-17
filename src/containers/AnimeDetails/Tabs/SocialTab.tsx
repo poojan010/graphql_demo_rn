@@ -1,16 +1,21 @@
-import React, { FC, forwardRef } from 'react'
 import { useQuery } from '@apollo/client';
+import React, { FC, forwardRef } from 'react'
+import Animated from 'react-native-reanimated';
 import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import useThemedStyles from 'hooks/useThemedStyles';
 
+import InfoContainer from '../InfoContainer';
 import ActivityCard from 'components/ActivityCard';
 import ListFooterLoader from 'components/ActivityIndicator';
 
 import { GET_ACTIVITIES } from '../queries';
 
+import { HEADER_MIN_HEIGHT } from '../helper';
+
 import constants from 'constants/index';
-import Animated from 'react-native-reanimated';
+import { WINDOW } from 'utils/index';
+
 const screenConstants = constants.animeDetails
 
 
@@ -80,36 +85,37 @@ const SocialTab = forwardRef<FlatList, ISocialTab>(({ mediaItem, ...restProps },
                         ? <ListFooterLoader />
                         : <LoadMoreButton onPress={loadMoreData} />
                     }
+                    <View style={style.bottomSpace} />
                 </View>
             )
         }
-        else return null
+        else return <View style={style.bottomSpace} />
     }
 
     const renderHeaderComponent = () => {
         return (
-            <Text style={style.sectionTitle}>
-                {screenConstants.recentActivity}
-            </Text>
+            <>
+                <InfoContainer mediaItem={mediaItem} />
+                <Text style={style.sectionTitle}>
+                    {screenConstants.recentActivity}
+                </Text>
+            </>
         )
     }
 
 
     return (
-        <View style={style.container}>
-
-            <Animated.FlatList
-                data={activities} //@ts-ignore
-                ref={ref}
-                {...restProps}
-                bounces={false}
-                scrollEventThrottle={16}
-                renderItem={renderThread}
-                ListHeaderComponent={renderHeaderComponent}
-                ListFooterComponent={renderFooterComponent}
-            />
-
-        </View>
+        <Animated.FlatList
+            data={activities} //@ts-ignore
+            ref={ref}
+            {...restProps}
+            bounces={false}
+            scrollEventThrottle={16}
+            renderItem={renderThread}
+            contentContainerStyle={style.container}
+            ListHeaderComponent={renderHeaderComponent}
+            ListFooterComponent={renderFooterComponent}
+        />
     )
 })
 
@@ -117,7 +123,8 @@ export default SocialTab
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        minHeight: WINDOW.height
     },
     sectionTitle: {
         fontSize: 14,
@@ -138,5 +145,8 @@ const styles = (theme: any) => StyleSheet.create({
     },
     footerContainer: {
         marginTop: 5
+    },
+    bottomSpace: {
+        height: HEADER_MIN_HEIGHT
     }
 })

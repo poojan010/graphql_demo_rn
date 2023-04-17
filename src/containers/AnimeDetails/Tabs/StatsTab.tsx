@@ -1,5 +1,6 @@
 import React, { FC, forwardRef } from 'react'
 import { useQuery } from '@apollo/client';
+import Animated from 'react-native-reanimated';
 import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { VictoryArea, VictoryAxis, VictoryBar, VictoryChart, VictoryLabel, VictoryTheme } from "victory-native";
 
@@ -7,11 +8,11 @@ import { WINDOW } from 'utils/index';
 import useTheme from 'hooks/useTheme';
 import useThemedStyles from 'hooks/useThemedStyles';
 
+import InfoContainer from '../InfoContainer';
+
 import { GET_STATS } from '../queries';
-import Animated from 'react-native-reanimated';
 
-
-
+import { HEADER_MIN_HEIGHT } from '../helper';
 
 
 
@@ -32,14 +33,21 @@ const StatsTab = forwardRef<FlatList, IStatsTab>(({ mediaItem, ...restProps }, r
             id: mediaItem?.id,
         }
     })
-    if (__DEV__) console.log("data", data);
 
 
     const recerntActivitiesData = data?.Media?.trends?.nodes
         ? [...data?.Media?.trends?.nodes].reverse().slice(1).map((item, index) => ({ ...item, day: (index + 2).toString(), x: (index + 2).toString(), y: item?.trending }))
         : []
 
+    const renderFooterComponent = () => {
+        return <View style={style.bottomSpace} />
+    }
 
+    const renderHeaderComponent = () => {
+        return (
+            <InfoContainer mediaItem={mediaItem} />
+        )
+    }
 
     return (
         <Animated.FlatList
@@ -49,6 +57,9 @@ const StatsTab = forwardRef<FlatList, IStatsTab>(({ mediaItem, ...restProps }, r
             bounces={false}
             style={style.container}
             scrollEventThrottle={16}
+            contentContainerStyle={style.container}
+            ListHeaderComponent={renderHeaderComponent}
+            ListFooterComponent={renderFooterComponent}
             renderItem={() => {
                 return (
                     <>
@@ -87,7 +98,8 @@ export default StatsTab
 
 const styles = (theme: any) => StyleSheet.create({
     container: {
-        marginHorizontal: 10
+        marginHorizontal: 10,
+        height: WINDOW.height
     },
     sectionTitle: {
         fontSize: 14,
@@ -95,4 +107,7 @@ const styles = (theme: any) => StyleSheet.create({
         color: theme.colors.text,
         marginTop: 20
     },
+    bottomSpace: {
+        height: HEADER_MIN_HEIGHT
+    }
 })
